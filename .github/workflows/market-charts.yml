@@ -5,13 +5,14 @@ on:
   workflow_dispatch:
 
   schedule:
-    # Saudi market: Sunday-Thursday
-    # Riyadh time, hourly checks
+    # Saudi market: Sunday to Thursday
+    # Runs at 10:12, 11:12, 12:12, 13:12, 14:12
     - cron: "12 10-14 * * 0-4"
       timezone: "Asia/Riyadh"
 
-    # US market: Monday-Friday
-    # New York time, hourly checks
+    # US market: Monday to Friday
+    # Runs at 09:42 through 15:42
+    # Automatically handles daylight saving time
     - cron: "42 9-15 * * 1-5"
       timezone: "America/New_York"
 
@@ -36,11 +37,39 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install requests
+        run: python -m pip install requests
+
+      - name: Test Discord webhook
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          python - <<'PY'
+          import os
+          import requests
+
+          url = os.environ.get("DISCORD_WEBHOOK_URL")
+
+          if not url:
+              raise RuntimeError(
+                  "DISCORD_WEBHOOK_URL secret is missing"
+              )
+
+          response = requests.post(
+              url,
+              json={
+                  "content": "Sahm Market Charts webhook test",
+                  "allowed_mentions": {"parse": []}
+              },
+              timeout=30
+          )
+
+          response.raise_for_status()
+          print("Discord webhook test successful")
+          PY
 
       - name: Generate market charts
         env:
           CHART_IMG_API_KEY: ${{ secrets.CHART_IMG_API_KEY }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          ENABLE_PUBLIC_POSTING: "true"
+          ENABLE_PUBLIC_POSTING: "false"
         run: python post_charts.py
