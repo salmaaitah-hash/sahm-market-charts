@@ -71,5 +71,5 @@ jobs:
         env:
           CHART_IMG_API_KEY: ${{ secrets.CHART_IMG_API_KEY }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          ENABLE_PUBLIC_POSTING: "false"
+          ENABLE_PUBLIC_POSTING: "true"
         run: python post_charts.py
