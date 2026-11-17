@@ -1,0 +1,46 @@
+
+name: Sahm Market Charts
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    # Saudi market: Sunday-Thursday
+    # Riyadh time, hourly checks
+    - cron: "12 10-14 * * 0-4"
+      timezone: "Asia/Riyadh"
+
+    # US market: Monday-Friday
+    # New York time, hourly checks
+    - cron: "42 9-15 * * 1-5"
+      timezone: "America/New_York"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: market-chart-publisher
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Generate market charts
+        env:
+          CHART_IMG_API_KEY: ${{ secrets.CHART_IMG_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          ENABLE_PUBLIC_POSTING: "false"
+        run: python post_charts.py
