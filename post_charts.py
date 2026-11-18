@@ -71,14 +71,40 @@ def generate_chart(symbol, api_key):
     return response.content
 
 
+
 def send_chart(name, symbol, image, webhook_url):
+    import json
+
+    market = "🇸🇦 السوق السعودي" if symbol.startswith("TADAWUL:") else "🇺🇸 السوق الأمريكي"
+
+    chart_names = {
+        "TADAWUL:TASI": "مؤشر تاسي",
+        "TADAWUL:1120": "مصرف الراجحي",
+        "SP:SPX": "مؤشر S&P 500",
+        "NASDAQ:NDX": "مؤشر Nasdaq 100",
+    }
+
+    chart_name = chart_names.get(symbol, name)
+
+    message = (
+        "📊 **تحديث الأسواق المالية | ديوانية سهم 💚**\n\n"
+        f"{market}\n"
+        f"📈 **{chart_name}**\n"
+        "⏱️ الإطار الزمني: ساعة واحدة (1H)\n\n"
+        "💚 تابع حركة السوق عبر الشارت المرفق"
+    )
+
     filename = symbol.replace(":", "_") + ".png"
 
     response = requests.post(
         webhook_url,
         data={
-            "payload_json": (
-                '{"allowed_mentions":{"parse":[]}}'
+            "payload_json": json.dumps(
+                {
+                    "content": message,
+                    "allowed_mentions": {"parse": []},
+                },
+                ensure_ascii=False,
             )
         },
         files={
@@ -90,8 +116,10 @@ def send_chart(name, symbol, image, webhook_url):
         },
         timeout=30,
     )
+
     response.raise_for_status()
     print(f"Posted chart: {name}")
+
 
 
 def main():
