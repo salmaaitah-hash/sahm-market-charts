@@ -87,12 +87,11 @@ def send_chart(name, symbol, image, webhook_url):
     chart_name = chart_names.get(symbol, name)
 
     message = (
-        "📊 **تحديث الأسواق المالية | ديوانية سهم 💚**\n\n"
-        f"{market}\n"
-        f"📈 **{chart_name}**\n"
-        "⏱️ الإطار الزمني: ساعة واحدة (1H)\n\n"
-        "💚 تابع حركة السوق عبر الشارت المرفق"
-    )
+    f"{market}\n"
+    f"📈 **{chart_name}**\n"
+    "⏱️ الإطار الزمني: ساعة واحدة (1H)\n\n"
+    "💚 تابع حركة السوق عبر الشارت المرفق"
+)
 
     filename = symbol.replace(":", "_") + ".png"
 
