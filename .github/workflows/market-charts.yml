@@ -57,7 +57,7 @@ jobs:
           response = requests.post(
               url,
               json={
-                  "content": "Sahm Market Charts webhook test",
+                  "content": "📊 تحديث الأسواق المالية | ديوانية سهم 💚",
                   "allowed_mentions": {"parse": []}
               },
               timeout=30
